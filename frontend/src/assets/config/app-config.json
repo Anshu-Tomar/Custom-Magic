@@ -1,0 +1,22 @@
+{
+  "appName": "Custom Magic",
+  "logo": {
+    "text": "Custom Magic",
+    "icon": "⚡",
+    "imageUrl": null,
+    "tagline": "10-min delivery"
+  },
+  "theme": {
+    "primaryColor": "#39FF14",
+    "secondaryColor": "#00FFFF",
+    "accentColor": "#BF5FFF"
+  },
+  "contact": {
+    "email": "support@blinkzone.in",
+    "phone": "+91-9876543210"
+  },
+  "social": {
+    "instagram": "https://instagram.com/blinkzone",
+    "twitter": "https://twitter.com/blinkzone"
+  }
+}

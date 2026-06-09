@@ -1,0 +1,169 @@
+<div class="animate-slide-in">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="font-display font-black text-3xl text-white">Products 📦</h1>
+      <p class="text-gray-500 text-sm mt-1">{{ total }} total products</p>
+    </div>
+    <button (click)="openForm()" class="btn-neon flex items-center gap-2 px-5 py-2.5 text-sm">
+      + Add Product
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="glass-card rounded-2xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-white/5">
+            <th class="text-left px-5 py-4 text-xs text-gray-500 uppercase tracking-wider">Product</th>
+            <th class="text-left px-5 py-4 text-xs text-gray-500 uppercase tracking-wider">Category</th>
+            <th class="text-right px-5 py-4 text-xs text-gray-500 uppercase tracking-wider">Price</th>
+            <th class="text-right px-5 py-4 text-xs text-gray-500 uppercase tracking-wider">Stock</th>
+            <th class="text-left px-5 py-4 text-xs text-gray-500 uppercase tracking-wider">Tags</th>
+            <th class="text-right px-5 py-4 text-xs text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="loading">
+            <td colspan="6" class="px-5 py-8">
+              <div class="space-y-3">
+                <div *ngFor="let s of skeletons" class="skeleton h-10 rounded-lg"></div>
+              </div>
+            </td>
+          </tr>
+          <tr *ngFor="let p of products"
+              class="border-b border-white/5 hover:bg-white/3 transition-colors">
+            <td class="px-5 py-4">
+              <div class="flex items-center gap-3">
+                <img [src]="p.thumbnail || 'assets/images/placeholder.svg'" [alt]="p.name"
+                     class="w-10 h-10 rounded-lg object-contain bg-white/5 p-1 flex-shrink-0">
+                <div>
+                  <div class="font-medium text-white">{{ p.name }}</div>
+                  <div class="flex gap-1 mt-0.5">
+                    <span *ngIf="p.isFeatured" class="text-xs bg-neon-cyan/10 text-neon-cyan px-1.5 py-0.5 rounded">Featured</span>
+                    <span *ngIf="p.isFlashDeal" class="text-xs bg-neon-purple/10 text-neon-purple px-1.5 py-0.5 rounded">Flash</span>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-5 py-4 text-gray-400">{{ p.category }}</td>
+            <td class="px-5 py-4 text-right">
+              <div class="text-white font-semibold">₹{{ p.price }}</div>
+              <div *ngIf="p.originalPrice" class="text-xs text-gray-500 line-through">₹{{ p.originalPrice }}</div>
+            </td>
+            <td class="px-5 py-4 text-right">
+              <span [class.text-green-400]="p.stock > 10"
+                    [class.text-yellow-400]="p.stock > 0 && p.stock <= 10"
+                    [class.text-red-400]="p.stock === 0" class="font-semibold">
+                {{ p.stock }}
+              </span>
+            </td>
+            <td class="px-5 py-4">
+              <div class="flex flex-wrap gap-1">
+                <span *ngFor="let tag of p.tags?.slice(0,2)" class="text-xs bg-white/5 text-gray-400 px-2 py-0.5 rounded-full">{{ tag }}</span>
+              </div>
+            </td>
+            <td class="px-5 py-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <button (click)="openForm(p)" class="text-xs text-neon-cyan hover:underline px-3 py-1.5 rounded-lg hover:bg-neon-cyan/10 transition-colors">Edit</button>
+                <button (click)="delete(p._id, p.name)" class="text-xs text-red-400 hover:underline px-3 py-1.5 rounded-lg hover:bg-red-400/10 transition-colors">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && products.length === 0">
+            <td colspan="6" class="px-5 py-12 text-center text-gray-500">No products found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination -->
+    <div *ngIf="pages > 1" class="flex justify-center gap-2 p-4 border-t border-white/5">
+      <button (click)="changePage(page-1)" [disabled]="page===1" class="px-4 py-2 rounded-xl glass-card text-sm disabled:opacity-30">← Prev</button>
+      <span class="px-4 py-2 text-sm text-gray-400">{{ page }} / {{ pages }}</span>
+      <button (click)="changePage(page+1)" [disabled]="page===pages" class="px-4 py-2 rounded-xl glass-card text-sm disabled:opacity-30">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Product Form Modal -->
+<div *ngIf="showForm" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/70 overlay-blur" (click)="closeForm()"></div>
+  <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto glass-card rounded-3xl p-6 animate-slide-in">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="font-display font-semibold text-xl text-white">{{ editProduct ? 'Edit Product' : 'New Product' }}</h2>
+      <button (click)="closeForm()" class="text-gray-500 hover:text-gray-800 text-2xl">×</button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div class="sm:col-span-2">
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Product Name *</label>
+          <input formControlName="name" class="input-genz" placeholder="Product name">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Description *</label>
+          <textarea formControlName="description" class="input-genz h-20 resize-none" placeholder="Describe the product"></textarea>
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Price (₹) *</label>
+          <input formControlName="price" type="number" class="input-genz" placeholder="99">
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Original Price (₹)</label>
+          <input formControlName="originalPrice" type="number" class="input-genz" placeholder="120">
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Category *</label>
+          <select formControlName="category" class="input-genz">
+            <option value="">Select category</option>
+            <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Brand</label>
+          <input formControlName="brand" class="input-genz" placeholder="Brand name">
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Stock *</label>
+          <input formControlName="stock" type="number" class="input-genz" placeholder="0">
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Unit</label>
+          <input formControlName="unit" class="input-genz" placeholder="kg, piece, 250ml...">
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Delivery Time</label>
+          <input formControlName="deliveryTime" class="input-genz" placeholder="10 mins">
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Tags (comma-separated)</label>
+          <input formControlName="tags" class="input-genz" placeholder="fruits, fresh, organic">
+        </div>
+        <div class="sm:col-span-2 flex gap-6">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input formControlName="isFeatured" type="checkbox" class="w-4 h-4 rounded">
+            <span class="text-sm text-gray-300">Featured Product</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input formControlName="isFlashDeal" type="checkbox" class="w-4 h-4 rounded">
+            <span class="text-sm text-gray-300">Flash Deal</span>
+          </label>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Product Images</label>
+          <input type="file" multiple accept="image/*" (change)="onFileSelect($event)"
+                 class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-neon-green/10 file:text-neon-green hover:file:bg-neon-green/20 cursor-pointer">
+          <p *ngIf="selectedFiles.length" class="text-xs text-neon-green mt-1">{{ selectedFiles.length }} file(s) selected</p>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button type="submit" [disabled]="saving" class="btn-neon flex-1 py-3 flex items-center justify-center gap-2 disabled:opacity-50">
+          <span *ngIf="saving" class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+          {{ saving ? 'Saving...' : (editProduct ? 'Update Product' : 'Create Product') }}
+        </button>
+        <button type="button" (click)="closeForm()" class="btn-ghost px-6 py-3">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,120 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 page-enter">
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-2 gap-10">
+    <div class="skeleton rounded-3xl h-80"></div>
+    <div class="space-y-4">
+      <div class="skeleton h-8 w-3/4 rounded"></div>
+      <div class="skeleton h-4 w-1/3 rounded"></div>
+      <div class="skeleton h-4 w-full rounded"></div>
+      <div class="skeleton h-4 w-5/6 rounded"></div>
+      <div class="skeleton h-12 w-1/2 rounded-xl"></div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && product">
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 text-sm text-gray-500 mb-8">
+      <a routerLink="/" class="hover:text-neon-green transition-colors">Home</a>
+      <span>/</span>
+      <a routerLink="/products" class="hover:text-neon-green transition-colors">Products</a>
+      <span>/</span>
+      <a [routerLink]="['/products']" [queryParams]="{category: product.category}" class="hover:text-neon-green transition-colors">{{ product.category }}</a>
+      <span>/</span>
+      <span class="text-white">{{ product.name }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+      <!-- Images -->
+      <div>
+        <div class="glass-card rounded-3xl overflow-hidden h-80 flex items-center justify-center mb-4 relative">
+          <img [src]="product.images?.[selectedImage] || product.thumbnail || 'assets/images/placeholder.svg'"
+               [alt]="product.name"
+               class="max-h-full max-w-full object-contain p-8">
+          <div *ngIf="product.isFlashDeal" class="absolute top-4 left-4 badge-neon">⚡ Flash Deal</div>
+          <div *ngIf="product.discountPercent" class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-lg">{{ product.discountPercent }}% OFF</div>
+        </div>
+        <!-- Thumbnails -->
+        <div *ngIf="product.images?.length > 1" class="flex gap-3">
+          <div *ngFor="let img of product.images; let i = index"
+               (click)="selectedImage = i"
+               class="w-16 h-16 rounded-xl overflow-hidden glass-card cursor-pointer transition-all"
+               [class.border-neon-green]="selectedImage === i"
+               [class.border]="selectedImage === i">
+            <img [src]="img" [alt]="product.name" class="w-full h-full object-contain p-2">
+          </div>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div>
+        <span class="badge-neon text-xs mb-3 inline-block">{{ product.category }}</span>
+        <h1 class="font-display font-black text-3xl text-white mb-2">{{ product.name }}</h1>
+
+        <div class="flex items-center gap-4 mb-4">
+          <app-star-rating [rating]="product.rating" [count]="product.reviewCount"></app-star-rating>
+          <span class="text-xs text-gray-500">{{ product.unit }}</span>
+        </div>
+
+        <div class="flex items-baseline gap-3 mb-6">
+          <span class="font-display font-black text-4xl text-white">₹{{ product.price }}</span>
+          <span *ngIf="product.originalPrice && product.originalPrice > product.price" class="text-xl text-gray-500 line-through">₹{{ product.originalPrice }}</span>
+          <span *ngIf="product.discountPercent" class="text-green-400 text-sm font-semibold">Save ₹{{ product.originalPrice! - product.price }}</span>
+        </div>
+
+        <!-- Delivery time -->
+        <div class="flex items-center gap-2 mb-6 glass-card rounded-xl p-3 w-fit border-neon-green/20">
+          <span class="text-neon-green text-lg">⚡</span>
+          <div>
+            <div class="text-sm font-semibold text-white">{{ product.deliveryTime }} delivery</div>
+            <div class="text-xs text-gray-500">On your doorstep</div>
+          </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="mb-6">
+          <span *ngIf="product.stock > 10" class="text-sm text-green-400">✓ In Stock ({{ product.stock }} left)</span>
+          <span *ngIf="product.stock > 0 && product.stock <= 10" class="text-sm text-yellow-400">⚠ Only {{ product.stock }} left!</span>
+          <span *ngIf="product.stock === 0" class="text-sm text-red-400">✗ Out of Stock</span>
+        </div>
+
+        <!-- Cart Actions -->
+        <div class="flex items-center gap-4 mb-8">
+          <ng-container *ngIf="product.stock > 0">
+            <div *ngIf="!isInCart">
+              <button (click)="addToCart()" class="btn-neon px-8 py-4 text-base flex items-center gap-2">
+                <span>🛒</span> Add to Cart
+              </button>
+            </div>
+            <div *ngIf="isInCart" class="flex items-center gap-3">
+              <button (click)="decrement()" class="w-10 h-10 rounded-xl glass-card hover:bg-white/10 text-white font-bold text-xl flex items-center justify-center transition-colors">−</button>
+              <span class="w-10 text-center font-bold text-xl text-neon-green">{{ quantity }}</span>
+              <button (click)="increment()" class="w-10 h-10 rounded-xl glass-card hover:bg-white/10 text-white font-bold text-xl flex items-center justify-center transition-colors">+</button>
+              <a routerLink="/cart" class="btn-neon px-6 py-3 ml-2">View Cart →</a>
+            </div>
+          </ng-container>
+          <button *ngIf="product.stock === 0" disabled class="btn-ghost opacity-40 cursor-not-allowed px-8 py-4">
+            Out of Stock
+          </button>
+        </div>
+
+        <!-- Description -->
+        <div class="glass-card rounded-2xl p-5 border-white/5">
+          <h3 class="font-display font-semibold text-white mb-3">About this product</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">{{ product.description }}</p>
+          <div *ngIf="product.tags?.length" class="flex flex-wrap gap-2 mt-4">
+            <span *ngFor="let tag of product.tags" class="text-xs px-2 py-1 rounded-lg bg-white/5 text-gray-400">#{{ tag }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <div *ngIf="relatedProducts.length > 0" class="mt-16">
+      <h2 class="font-display font-bold text-2xl text-white mb-6">More from <span class="gradient-text">{{ product.category }}</span></h2>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <app-product-card *ngFor="let p of relatedProducts" [product]="p"></app-product-card>
+      </div>
+    </div>
+  </div>
+</div>

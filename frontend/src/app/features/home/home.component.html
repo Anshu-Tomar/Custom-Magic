@@ -1,0 +1,210 @@
+<div class="page-enter">
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="relative overflow-hidden min-h-[480px] flex items-center">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 bg-genz-dark">
+      <div class="absolute inset-0" style="background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(236,72,153,0.10) 0%, transparent 70%), radial-gradient(ellipse 60% 50% at 100% 50%, rgba(139,92,246,0.08) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 0% 80%, rgba(249,115,22,0.07) 0%, transparent 60%)"></div>
+      <!-- Floating orbs -->
+      <div class="absolute top-20 right-20 w-64 h-64 rounded-full animate-float opacity-30" style="background: radial-gradient(circle, #EC4899, transparent)"></div>
+      <div class="absolute bottom-10 left-10 w-48 h-48 rounded-full animate-float opacity-20" style="background: radial-gradient(circle, #8B5CF6, transparent); animation-delay: -3s"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full text-xs font-mono text-neon-green border-neon-green/20 mb-6 animate-pulse-slow">
+          <span class="w-2 h-2 rounded-full bg-neon-green animate-pulse"></span>
+          ✨ Gifts, Stationery & More
+        </div>
+
+        <h1 class="font-display font-black text-5xl sm:text-6xl lg:text-7xl leading-none mb-6">
+          <span class="text-white">Gifts &</span><br>
+          <span class="gradient-text">Stationery</span><br>
+          <span class="text-white">Magic. 🎁</span>
+        </h1>
+
+        <p class="text-gray-400 text-lg mb-8 font-body max-w-md leading-relaxed">
+          Kids gifts, stationery, toys & art supplies — handpicked with love, delivered with magic.
+        </p>
+
+        <div class="flex flex-wrap gap-4">
+          <button (click)="navigateToProducts()" class="btn-neon flex items-center gap-2 text-base px-8 py-4">
+            <span>🎁 Shop Gifts</span>
+            <span>→</span>
+          </button>
+          <a routerLink="/products" [queryParams]="{flashDeal: 'true'}"
+             class="btn-ghost flex items-center gap-2 text-base px-8 py-4">
+            ✨ Flash Deals
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="flex gap-8 mt-10">
+          <div *ngFor="let stat of [{v:'Fast', l:'Delivery'},{v:'500+', l:'Products'},{v:'4.9★', l:'Rating'}]">
+            <div class="font-display font-black text-2xl text-white">{{ stat.v }}</div>
+            <div class="text-xs text-gray-500">{{ stat.l }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero graphic -->
+      <div class="hidden lg:flex justify-center items-center">
+        <div class="relative">
+          <div class="w-80 h-80 rounded-3xl glass-card border-white/10 flex items-center justify-center text-[160px] animate-float">
+            🎁
+          </div>
+          <!-- Floating chips -->
+          <div class="absolute -top-4 -right-4 glass-card px-4 py-2 rounded-xl border-neon-green/30 animate-bounce-in">
+            <div class="text-xs text-neon-green font-mono">✓ Gift Wrapped!</div>
+            <div class="text-xs text-gray-500">Ready to ship</div>
+          </div>
+          <div class="absolute -bottom-4 -left-4 glass-card px-4 py-2 rounded-xl border-neon-purple/30" style="animation: float 4s ease-in-out infinite; animation-delay: -2s">
+            <div class="text-xs text-neon-purple font-mono">🎀 New Arrival</div>
+            <div class="text-xs text-gray-500">Just dropped</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CATEGORIES ===== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="font-display font-bold text-2xl text-white">Shop by <span class="gradient-text">Category</span></h2>
+    </div>
+    <div class="flex gap-3 overflow-x-auto categories-scroll pb-2">
+      <button *ngFor="let cat of categories"
+              (click)="filterByCategory(cat)"
+              class="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-300"
+              [ngClass]="activeCategory === cat
+                ? 'bg-neon-green text-black shadow-lg shadow-neon-green/30'
+                : 'glass-card text-gray-600 hover:border-pink-400/40 hover:text-pink-600 border border-pink-100'">
+        <span>{{ getCategoryIcon(cat) }}</span>
+        <span>{{ cat }}</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== FLASH DEALS ===== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div class="glass-card rounded-3xl p-6 border-neon-purple/20 overflow-hidden relative">
+      <!-- BG accent -->
+      <div class="absolute inset-0 opacity-5" style="background: linear-gradient(135deg, #EC4899, #8B5CF6)"></div>
+
+      <div class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-2xl">⚡</span>
+            <h2 class="font-display font-black text-2xl text-white">Flash Deals</h2>
+          </div>
+          <p class="text-sm text-gray-500">Grab 'em before they're gone</p>
+        </div>
+
+        <!-- Countdown Timer -->
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-500 font-mono">Ends in:</span>
+          <div class="flex items-center gap-1">
+            <div class="timer-block">{{ pad(countdown.hours) }}</div>
+            <span class="text-neon-purple font-bold">:</span>
+            <div class="timer-block">{{ pad(countdown.minutes) }}</div>
+            <span class="text-neon-purple font-bold">:</span>
+            <div class="timer-block">{{ pad(countdown.seconds) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="flashLoading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <app-skeleton *ngFor="let s of [1,2,3,4,5,6]" type="card"></app-skeleton>
+      </div>
+
+      <div *ngIf="!flashLoading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <app-product-card *ngFor="let p of flashDeals" [product]="p"></app-product-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURED PRODUCTS ===== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="font-display font-bold text-2xl text-white">
+          {{ activeCategory === 'All' ? 'Featured' : activeCategory }}
+          <span class="gradient-text"> Products</span>
+        </h2>
+        <p class="text-sm text-gray-500 mt-1">Curated picks just for you</p>
+      </div>
+      <button routerLink="/products" class="btn-ghost text-sm px-4 py-2">View All →</button>
+    </div>
+
+    <!-- Loading Skeletons -->
+    <div *ngIf="loading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+      <app-skeleton *ngFor="let s of skeletonArray" type="card"></app-skeleton>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!loading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+      <app-product-card *ngFor="let p of featuredProducts" [product]="p"></app-product-card>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && featuredProducts.length === 0"
+         class="text-center py-16">
+      <div class="text-6xl mb-4">🔍</div>
+      <h3 class="font-display font-semibold text-xl text-white mb-2">No products found</h3>
+      <p class="text-gray-500">Try a different category</p>
+    </div>
+  </section>
+
+  <!-- ===== PROMOTIONAL BANNER ===== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Banner 1 -->
+      <div class="glass-card rounded-3xl p-8 border-neon-green/20 relative overflow-hidden group cursor-pointer"
+           routerLink="/products" [queryParams]="{category: 'Gifts'}">
+        <div class="absolute inset-0 bg-gradient-to-br from-pink-400/10 to-transparent group-hover:from-pink-400/20 transition-all duration-500"></div>
+        <div class="relative">
+          <div class="text-4xl mb-3">🎁</div>
+          <h3 class="font-display font-black text-xl text-white mb-1">Kids Gifts</h3>
+          <p class="text-sm text-gray-400 mb-4">Perfect presents for every age</p>
+          <span class="text-neon-green text-sm font-semibold">Shop Now →</span>
+        </div>
+      </div>
+
+      <!-- Banner 2 -->
+      <div class="glass-card rounded-3xl p-8 border-neon-cyan/20 relative overflow-hidden group cursor-pointer"
+           routerLink="/products" [queryParams]="{category: 'Stationery'}">
+        <div class="absolute inset-0 bg-gradient-to-br from-violet-400/10 to-transparent group-hover:from-violet-400/20 transition-all duration-500"></div>
+        <div class="relative">
+          <div class="text-4xl mb-3">✏️</div>
+          <h3 class="font-display font-black text-xl text-white mb-1">Stationery</h3>
+          <p class="text-sm text-gray-400 mb-4">Notebooks, pens & art supplies</p>
+          <span class="text-neon-cyan text-sm font-semibold">Explore →</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== APP DOWNLOAD CTA ===== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+    <div class="glass-card rounded-3xl p-10 text-center border-white/5 relative overflow-hidden">
+      <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(57,255,20,0.05) 0%, transparent 70%)"></div>
+      <div class="relative">
+        <div class="text-5xl mb-4">📱</div>
+        <h2 class="font-display font-black text-3xl text-white mb-3">
+          Get the <span class="gradient-text">Custom Magic</span> App
+        </h2>
+        <p class="text-gray-400 mb-8 max-w-md mx-auto">
+          Track orders in real-time, get exclusive app-only deals, and checkout in one tap.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <button class="btn-neon flex items-center gap-2 px-6 py-3">
+            <span>🍎</span> App Store
+          </button>
+          <button class="btn-ghost flex items-center gap-2 px-6 py-3">
+            <span>🤖</span> Google Play
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

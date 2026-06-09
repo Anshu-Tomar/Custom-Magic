@@ -1,0 +1,105 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 page-enter">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="font-display font-black text-3xl text-white">
+        {{ filters.flashDeal ? '⚡ Flash Deals' : filters.category || 'All Products' }}
+      </h1>
+      <p class="text-gray-500 text-sm mt-1">{{ total }} products found</p>
+    </div>
+    <select [(ngModel)]="filters.sort" (change)="applyFilter()"
+            class="input-genz w-auto text-sm">
+      <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
+    </select>
+  </div>
+
+  <div class="flex gap-6">
+    <!-- Sidebar Filters -->
+    <aside class="hidden lg:block w-64 flex-shrink-0">
+      <div class="glass-card rounded-2xl p-5 sticky top-24 space-y-6">
+        <div class="flex items-center justify-between">
+          <h3 class="font-display font-semibold text-white">Filters</h3>
+          <button (click)="clearFilters()" class="text-xs text-neon-cyan hover:underline">Clear all</button>
+        </div>
+
+        <!-- Search -->
+        <div>
+          <label class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 block">Search</label>
+          <input [(ngModel)]="filters.search" (input)="applyFilter()" class="input-genz text-sm" placeholder="Search...">
+        </div>
+
+        <!-- Categories -->
+        <div>
+          <label class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-3 block">Category</label>
+          <div class="space-y-1">
+            <button (click)="filters.category=''; applyFilter()"
+                    class="w-full text-left text-sm px-3 py-2 rounded-lg transition-colors"
+                    [class.text-neon-green]="!filters.category"
+                    [class.text-gray-400]="filters.category">All</button>
+            <button *ngFor="let cat of categories"
+                    (click)="filters.category=cat; applyFilter()"
+                    class="w-full text-left text-sm px-3 py-2 rounded-lg transition-colors"
+                    [class.bg-neon-green]="filters.category === cat"
+                    [class.text-black]="filters.category === cat"
+                    [class.text-gray-400]="filters.category !== cat"
+                    [class.hover:bg-white]="filters.category !== cat"
+                    [class.hover:bg-opacity-5]="filters.category !== cat">
+              {{ cat }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Price Range -->
+        <div>
+          <label class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 block">Price Range</label>
+          <div class="flex gap-2">
+            <input [(ngModel)]="filters.minPrice" (change)="applyFilter()" type="number" class="input-genz text-sm" placeholder="Min ₹">
+            <input [(ngModel)]="filters.maxPrice" (change)="applyFilter()" type="number" class="input-genz text-sm" placeholder="Max ₹">
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Products -->
+    <div class="flex-1">
+      <!-- Loading -->
+      <div *ngIf="loading" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <app-skeleton *ngFor="let s of skeletonArray" type="card"></app-skeleton>
+      </div>
+
+      <!-- Grid -->
+      <div *ngIf="!loading && products.length > 0" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <app-product-card *ngFor="let p of products" [product]="p"></app-product-card>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && products.length === 0" class="text-center py-24">
+        <div class="text-6xl mb-4">🔍</div>
+        <h3 class="font-display text-xl font-semibold text-white mb-2">No results found</h3>
+        <p class="text-gray-500 mb-6">Try adjusting your filters</p>
+        <button (click)="clearFilters()" class="btn-ghost">Clear Filters</button>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="!loading && pages > 1" class="flex items-center justify-center gap-2 mt-10">
+        <button (click)="changePage(page-1)" [disabled]="page === 1"
+                class="px-4 py-2 rounded-xl glass-card text-sm disabled:opacity-30 hover:border-neon-cyan/30 transition-all">
+          ← Prev
+        </button>
+        <button *ngFor="let p of pageNumbers" (click)="changePage(p)"
+                class="w-10 h-10 rounded-xl text-sm font-bold transition-all"
+                [class.bg-neon-green]="p === page"
+                [class.text-black]="p === page"
+                [class.glass-card]="p !== page"
+                [class.text-white]="p !== page">
+          {{ p }}
+        </button>
+        <button (click)="changePage(page+1)" [disabled]="page === pages"
+                class="px-4 py-2 rounded-xl glass-card text-sm disabled:opacity-30 hover:border-neon-cyan/30 transition-all">
+          Next →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

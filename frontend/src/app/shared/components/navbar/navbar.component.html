@@ -1,0 +1,184 @@
+<nav class="navbar-glass fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+     [class.shadow-2xl]="isScrolled">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- Logo (from config JSON) -->
+      <a routerLink="/" class="flex items-center gap-2 group flex-shrink-0">
+        <ng-container *ngIf="appConfig?.logo?.imageUrl; else textLogo">
+          <img [src]="appConfig.logo.imageUrl" [alt]="appConfig?.logo?.text" class="h-8 w-auto">
+        </ng-container>
+        <ng-template #textLogo>
+          <div class="flex items-center gap-1.5">
+            <span class="text-2xl">{{ appConfig?.logo?.icon || '⚡' }}</span>
+            <div class="font-display font-black text-lg gradient-text leading-none">
+              {{ appConfig?.logo?.text || 'Custom Magic' }}
+            </div>
+          </div>
+        </ng-template>
+      </a>
+
+      <!-- Search Bar (desktop) -->
+      <div class="hidden md:flex flex-1 max-w-xl mx-6 relative" (clickOutside)="closeDropdowns()">
+        <div class="relative w-full">
+          <input
+            type="text"
+            class="input-genz px-10  pr-4 h-10 rounded-2xl w-full text-sm"
+            [(ngModel)]="searchQuery"
+            (input)="onSearch($event.target.value)"
+            (keyup.enter)="goToSearch()"
+          />
+          <svg class="absolute left-3 top-3 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+          </svg>
+          <button *ngIf="searchQuery" (click)="searchQuery=''; showSearchDropdown=false"
+            class="absolute right-3 top-2.5 text-gray-500 hover:text-pink-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Search Dropdown -->
+        <div *ngIf="showSearchDropdown && searchResults.length > 0"
+             class="absolute top-12 left-0 right-0 glass-card rounded-2xl overflow-hidden shadow-2xl border border-white/10 animate-slide-in z-50">
+          <div class="p-2">
+            <div *ngFor="let product of searchResults"
+                 (click)="goToProduct(product._id)"
+                 class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors group">
+              <img [src]="product.thumbnail || 'assets/images/placeholder.svg'" [alt]="product.name"
+                   class="w-10 h-10 rounded-lg object-cover bg-white/5">
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-white truncate group-hover:text-neon-green transition-colors">
+                  {{ product.name }}
+                </div>
+                <div class="text-xs text-gray-500">{{ product.category }}</div>
+              </div>
+              <div class="text-sm font-bold text-neon-green">₹{{ product.price }}</div>
+            </div>
+          </div>
+          <div class="px-4 py-2 border-t border-white/5">
+            <button (click)="goToSearch()" class="text-xs text-neon-cyan hover:underline w-full text-left">
+              See all results for "{{ searchQuery }}" →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Actions -->
+      <div class="flex items-center gap-2">
+        <!-- Page Nav Icons -->
+        <a routerLink="/about"
+           routerLinkActive="text-neon-green border-neon-green/30"
+           title="About"
+           class="hidden sm:flex p-2.5 rounded-xl glass-card border-white/10 hover:border-neon-green/30 hover:text-neon-green text-gray-400 transition-all items-center justify-center">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </a>
+        <a routerLink="/contact"
+           routerLinkActive="text-neon-cyan border-neon-cyan/30"
+           title="Contact"
+           class="hidden sm:flex p-2.5 rounded-xl glass-card border-white/10 hover:border-neon-cyan/30 hover:text-neon-cyan text-gray-400 transition-all items-center justify-center">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </a>
+        <a routerLink="/careers"
+           routerLinkActive="text-neon-purple border-neon-purple/30"
+           title="Careers"
+           class="hidden sm:flex p-2.5 rounded-xl glass-card border-white/10 hover:border-neon-purple/30 hover:text-neon-purple text-gray-400 transition-all items-center justify-center">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </a>
+
+        <!-- Cart -->
+        <a routerLink="/cart" class="relative p-2.5 rounded-xl glass-card border-white/10 hover:border-neon-green/30 transition-all">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+          <span *ngIf="cartCount > 0" class="cart-badge">{{ cartCount > 9 ? '9+' : cartCount }}</span>
+        </a>
+
+        <!-- User Menu -->
+        <ng-container *ngIf="currentUser; else loginBtn">
+          <div class="relative">
+            <button (click)="toggleUserMenu()"
+                    class="flex items-center gap-2 px-3 py-2 rounded-xl glass-card border-white/10 hover:border-neon-purple/30 transition-all">
+              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-neon-purple to-neon-cyan flex items-center justify-center text-xs font-bold text-black">
+                {{ currentUser.name.charAt(0).toUpperCase() }}
+              </div>
+              <span class="hidden sm:block text-sm font-medium text-white max-w-[80px] truncate">{{ currentUser.name }}</span>
+              <svg class="w-3 h-3 text-gray-400 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+
+            <!-- Dropdown -->
+            <div *ngIf="showUserMenu"
+                 class="absolute right-0 top-12 w-52 glass-card rounded-2xl overflow-hidden shadow-2xl border border-white/10 animate-slide-in z-50">
+              <div class="p-3 border-b border-white/5">
+                <div class="text-sm font-semibold text-white">{{ currentUser.name }}</div>
+                <div class="text-xs text-gray-500 truncate">{{ currentUser.email }}</div>
+                <span class="badge-neon mt-1 inline-block">{{ currentUser.role }}</span>
+              </div>
+              <div class="p-1">
+                <a routerLink="/user/dashboard" (click)="closeDropdowns()"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-pink-50 text-sm text-gray-600 hover:text-pink-600 transition-all">
+                  <span>🏠</span> Dashboard
+                </a>
+                <a routerLink="/user/orders" (click)="closeDropdowns()"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-pink-50 text-sm text-gray-600 hover:text-pink-600 transition-all">
+                  <span>📦</span> My Orders
+                </a>
+                <a *ngIf="auth.isAdmin" routerLink="/admin" (click)="closeDropdowns()"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 text-sm text-neon-purple hover:text-neon-purple transition-all">
+                  <span>⚙️</span> Admin Panel
+                </a>
+                <button (click)="logout()"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/10 text-sm text-gray-300 hover:text-red-400 transition-all w-full text-left">
+                  <span>🚪</span> Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-template #loginBtn>
+          <a routerLink="/auth/login"
+             class="btn-neon text-xs px-4 py-2.5 hidden sm:flex items-center gap-1.5">
+            Login
+          </a>
+        </ng-template>
+
+        <!-- Mobile menu button -->
+        <button (click)="toggleMobileMenu()" class="p-2 rounded-xl md:hidden text-gray-400">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Search -->
+    <div class="md:hidden pb-3">
+      <div class="relative">
+        <input
+          type="text"
+          class="input-genz pl-9 pr-4 h-10 rounded-2xl w-full text-sm"
+          placeholder="Search products..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearch($event.target.value)"
+          (keyup.enter)="goToSearch()"
+        />
+        <svg class="absolute left-3 top-3 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Spacer -->
+<div class="h-16 md:h-20"></div>

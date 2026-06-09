@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: blinkzone_mongo
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: blinkit_genz
+    networks:
+      - blinkzone_net
+
+  backend:
+    build: ./backend
+    container_name: blinkzone_backend
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      MONGODB_URI: mongodb://mongodb:27017/blinkit_genz
+      JWT_SECRET: custommodic_jwt_v1_s3cr3t_k3y_2025
+      JWT_REFRESH_SECRET: custommodic_refresh_v1_s3cr3t_2025
+      JWT_EXPIRE: 15m
+      JWT_REFRESH_EXPIRE: 7d
+      NODE_ENV: production
+      FRONTEND_URL: http://localhost
+    depends_on:
+      - mongodb
+    volumes:
+      - uploads_data:/app/uploads
+    networks:
+      - blinkzone_net
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: blinkzone_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - blinkzone_net
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+  uploads_data:
+
+networks:
+  blinkzone_net:
+    driver: bridge

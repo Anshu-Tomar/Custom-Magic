@@ -1,0 +1,142 @@
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 page-enter">
+  <h1 class="font-display font-black text-3xl text-white mb-8">Checkout 🚀</h1>
+
+  <!-- Stepper -->
+  <div class="flex items-center gap-0 mb-10">
+    <div *ngFor="let s of [{n:1,l:'Address'},{n:2,l:'Payment'},{n:3,l:'Confirm'}]; let last = last"
+         class="flex items-center">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300"
+             [class.bg-neon-green]="step >= s.n"
+             [class.text-black]="step >= s.n"
+             [class.glass-card]="step < s.n"
+             [class.text-gray-500]="step < s.n">
+          {{ step > s.n ? '✓' : s.n }}
+        </div>
+        <span class="text-sm hidden sm:block" [class.text-white]="step >= s.n" [class.text-gray-500]="step < s.n">{{ s.l }}</span>
+      </div>
+      <div *ngIf="!last" class="w-12 sm:w-24 h-px mx-3 transition-all duration-300"
+           [class.bg-neon-green]="step > s.n" [class.bg-white]="step <= s.n" [class.bg-opacity-10]="step <= s.n"></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+
+      <!-- Step 1: Address -->
+      <div *ngIf="step === 1" class="glass-card rounded-3xl p-6 animate-slide-in">
+        <h2 class="font-display font-semibold text-xl text-white mb-6">📍 Delivery Address</h2>
+        <form [formGroup]="addressForm" class="space-y-4">
+          <div>
+            <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Street Address</label>
+            <input formControlName="street" class="input-genz" placeholder="House No, Street, Area">
+            <p *ngIf="addressForm.get('street')?.touched && addressForm.get('street')?.invalid" class="text-xs text-red-400 mt-1">Required</p>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">City</label>
+              <input formControlName="city" class="input-genz" placeholder="City">
+              <p *ngIf="addressForm.get('city')?.touched && addressForm.get('city')?.invalid" class="text-xs text-red-400 mt-1">Required</p>
+            </div>
+            <div>
+              <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">State</label>
+              <input formControlName="state" class="input-genz" placeholder="State">
+              <p *ngIf="addressForm.get('state')?.touched && addressForm.get('state')?.invalid" class="text-xs text-red-400 mt-1">Required</p>
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Pincode</label>
+            <input formControlName="pincode" class="input-genz" placeholder="6-digit pincode" maxlength="6">
+            <p *ngIf="addressForm.get('pincode')?.touched && addressForm.get('pincode')?.invalid" class="text-xs text-red-400 mt-1">Valid 6-digit pincode required</p>
+          </div>
+          <div>
+            <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Delivery Note (optional)</label>
+            <input formControlName="notes" class="input-genz" placeholder="Leave at door, ring bell, etc.">
+          </div>
+        </form>
+        <button (click)="nextStep()" class="btn-neon mt-6 px-8 py-3">Continue to Payment →</button>
+      </div>
+
+      <!-- Step 2: Payment -->
+      <div *ngIf="step === 2" class="glass-card rounded-3xl p-6 animate-slide-in">
+        <h2 class="font-display font-semibold text-xl text-white mb-6">💳 Payment Method</h2>
+        <div class="space-y-3">
+          <div *ngFor="let opt of paymentOptions"
+               (click)="paymentMethod = opt.id"
+               class="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all border"
+               [class.border-neon-green]="paymentMethod === opt.id"
+               [class.bg-neon-green]="paymentMethod === opt.id"
+               [class.bg-opacity-5]="paymentMethod === opt.id"
+               [class.border-white]="paymentMethod !== opt.id"
+               [class.border-opacity-10]="paymentMethod !== opt.id">
+            <span class="text-2xl">{{ opt.icon }}</span>
+            <div class="flex-1">
+              <div class="font-semibold text-sm text-white">{{ opt.label }}</div>
+              <div class="text-xs text-gray-500">{{ opt.desc }}</div>
+            </div>
+            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0"
+                 [class.border-neon-green]="paymentMethod === opt.id"
+                 [class.border-gray-600]="paymentMethod !== opt.id">
+              <div *ngIf="paymentMethod === opt.id" class="w-2.5 h-2.5 rounded-full bg-neon-green"></div>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button (click)="step = 1" class="btn-ghost px-6 py-3">← Back</button>
+          <button (click)="nextStep()" class="btn-neon px-8 py-3">Review Order →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirm -->
+      <div *ngIf="step === 3" class="glass-card rounded-3xl p-6 animate-slide-in">
+        <h2 class="font-display font-semibold text-xl text-white mb-6">✅ Review Order</h2>
+
+        <!-- Items preview -->
+        <div class="space-y-3 mb-6 max-h-60 overflow-y-auto">
+          <div *ngFor="let item of cart.cartItems" class="flex items-center gap-3 text-sm">
+            <img [src]="item.product.thumbnail" class="w-10 h-10 rounded-lg object-contain bg-white/5 p-1">
+            <span class="flex-1 text-gray-300 truncate">{{ item.product.name }} × {{ item.quantity }}</span>
+            <span class="text-white font-semibold">₹{{ item.product.price * item.quantity }}</span>
+          </div>
+        </div>
+
+        <!-- Address summary -->
+        <div class="glass-card rounded-xl p-4 mb-4 border-white/5">
+          <div class="text-xs text-gray-500 mb-1">DELIVERING TO</div>
+          <div class="text-sm text-white">{{ addressForm.get('street')?.value }}, {{ addressForm.get('city')?.value }}, {{ addressForm.get('state')?.value }} - {{ addressForm.get('pincode')?.value }}</div>
+        </div>
+
+        <!-- Payment method -->
+        <div class="glass-card rounded-xl p-4 mb-6 border-white/5">
+          <div class="text-xs text-gray-500 mb-1">PAYMENT</div>
+          <div class="text-sm text-white">{{ paymentOptions | json }}</div>
+          <div class="text-sm text-white">{{ paymentMethod === 'COD' ? '💵 Cash on Delivery' : paymentMethod === 'UPI' ? '📱 UPI' : '💳 Card' }}</div>
+        </div>
+
+        <div class="flex gap-3">
+          <button (click)="step = 2" class="btn-ghost px-6 py-3">← Back</button>
+          <button (click)="placeOrder()" [disabled]="loading" class="btn-neon flex-1 py-3 flex items-center justify-center gap-2 disabled:opacity-50">
+            <span *ngIf="loading" class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+            {{ loading ? 'Placing Order...' : '🚀 Place Order' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary Sidebar -->
+    <div class="glass-card rounded-2xl p-5 h-fit sticky top-24">
+      <h3 class="font-display font-semibold text-white mb-4">Order Summary</h3>
+      <div class="space-y-2 text-sm mb-4">
+        <div class="flex justify-between text-gray-400"><span>Subtotal</span><span>₹{{ summary.subtotal | number:'1.0-0' }}</span></div>
+        <div class="flex justify-between text-gray-400"><span>Tax</span><span>₹{{ summary.tax | number:'1.0-0' }}</span></div>
+        <div class="flex justify-between text-gray-400"><span>Delivery</span><span [class.text-neon-green]="summary.delivery === 0">{{ summary.delivery === 0 ? 'FREE' : '₹' + summary.delivery }}</span></div>
+        <div *ngIf="summary.couponDiscount > 0" class="flex justify-between text-green-400"><span>Discount</span><span>−₹{{ summary.couponDiscount }}</span></div>
+      </div>
+      <div class="border-t border-white/10 pt-3 flex justify-between font-bold text-base">
+        <span class="text-white">Total</span>
+        <span class="text-neon-green">₹{{ summary.total | number:'1.0-0' }}</span>
+      </div>
+      <div class="mt-4 text-xs text-gray-600 text-center">⚡ 10-min delivery guaranteed</div>
+    </div>
+  </div>
+</div>
