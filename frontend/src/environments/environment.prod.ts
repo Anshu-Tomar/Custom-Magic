@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://REPLACE_WITH_RENDER_URL/api',
+  apiUrl: 'https://custom-magic.onrender.com/api',
   appConfigUrl: 'assets/config/app-config.json'
 };
